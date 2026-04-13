@@ -1,0 +1,19 @@
+/* Type-specific background color classes for badges and pills */
+.t-normal   { background-color: #9FA19F; }
+.t-fire     { background-color: #E62829; }
+.t-water    { background-color: #2980EF; }
+.t-electric { background-color: #FAC000; color: #333 !important; }
+.t-grass    { background-color: #3FA129; }
+.t-ice      { background-color: #3DCEF3; color: #333 !important; }
+.t-fighting { background-color: #FF8000; }
+.t-poison   { background-color: #9141CB; }
+.t-ground   { background-color: #915121; }
+.t-flying   { background-color: #81B9EF; }
+.t-psychic  { background-color: #EF4179; }
+.t-bug      { background-color: #91A119; }
+.t-rock     { background-color: #AFA981; color: #333 !important; }
+.t-ghost    { background-color: #704170; }
+.t-dragon   { background-color: #5060E1; }
+.t-dark     { background-color: #49392F; }
+.t-steel    { background-color: #60A1B8; }
+.t-fairy    { background-color: #EF70EF; }
