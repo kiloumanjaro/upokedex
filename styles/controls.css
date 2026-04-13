@@ -82,15 +82,27 @@
 }
 
 #loadMoreWrap {
+  position: relative;
+  isolation: isolate;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100vw;
   margin-top: 36px;
-  margin-left: calc(50% - 50vw);
   padding: 28px 20px;
   background: #f0c020;
+  box-shadow: 0 0 0 100vmax #f0c020;
+  clip-path: inset(0 -100vmax);
+}
+
+#loadMoreWrap::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
   border-top: 2px solid var(--border);
+  pointer-events: none;
 }
 #loadMoreBtn {
   width: fit-content;

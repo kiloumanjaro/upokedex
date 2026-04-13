@@ -44,3 +44,10 @@ body {
 @media (max-width: 540px) {
   .home-content { padding: 20px 12px 0; }
 }
+
+@media (min-width: 541px) {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+}

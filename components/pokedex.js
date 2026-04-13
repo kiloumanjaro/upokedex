@@ -14,6 +14,9 @@ const BOOK_PADDING = 8;
 const PAGE_FLIP_BLEED = 48;
 const PAGE_FLIP_DURATION = 600;
 const PAGE_FLIP_CLEANUP_DELAY = 610;
+const BOOK_COVER_COLOR = '#AA6F32';
+const BOOK_SPRING_COLOR = '#B0B0B0';
+const COVER_SPRING_CONNECTOR_WIDTH = PAGE_GAP + 10;
 let activeFit = null;
 let resizeBound = false;
 
@@ -21,35 +24,35 @@ function renderPageRings(side) {
   const sideClass = side === 'left' ? '-left-1 items-start' : '-right-1 items-end';
   const circleClass = side === 'left' ? 'left-3' : 'right-3';
   const barClass = side === 'left'
-    ? 'left-0 rounded-r bg-[#B0B0B0]'
-    : 'right-0 rounded-l bg-[#B0B0B0]';
+    ? 'left-0 rounded-r'
+    : 'right-0 rounded-l';
 
   return `
     <div data-ring-group="${side}" class="pointer-events-none absolute ${sideClass} top-0 flex h-full flex-col justify-around py-4">
       ${[0, 1, 2].map(i => `
         <div data-ring="${i}" class="relative flex h-4 w-8 items-center">
           <div class="absolute ${circleClass} h-3.5 w-3.5 rounded-full bg-[#121212]"></div>
-          <div class="absolute ${barClass} z-10 h-1.5 w-5"></div>
+          <div class="absolute ${barClass} z-10 h-1.5 w-5" style="background:${BOOK_SPRING_COLOR}"></div>
         </div>
       `).join('')}
     </div>`;
 }
 
-function renderCoverRings(side) {
-  const sideClass = side === 'left' ? 'right-0 items-end' : 'left-0 items-start';
-  const capClass = side === 'left'
-    ? 'right-0 rounded-r-full bg-[#1040C0]'
-    : 'left-0 rounded-l-full bg-[#1040C0]';
-  const barClass = side === 'left'
-    ? 'right-0.5 rounded-l bg-[#F0C020]'
-    : 'left-0.5 rounded-r bg-[#F0C020]';
-
+function renderCoverSpringConnectors() {
   return `
-    <div class="pointer-events-none absolute ${sideClass} top-0 flex h-full flex-col justify-around py-4">
+    <div
+      data-cover-spring-connectors
+      class="pointer-events-none absolute inset-y-0 left-1/2 z-10 flex -translate-x-1/2 flex-col justify-around py-4"
+      style="width:${COVER_SPRING_CONNECTOR_WIDTH}px"
+      aria-hidden="true"
+    >
       ${[0, 1, 2].map(i => `
-        <div class="relative flex h-4 w-7 items-center">
-          <div class="absolute ${capClass} h-3.5 w-[7px]"></div>
-          <div class="absolute ${barClass} h-1.5 w-5"></div>
+        <div class="flex h-4 items-center justify-center">
+          <div
+            data-cover-spring="${i}"
+            class="h-1.5 rounded-full"
+            style="width:${COVER_SPRING_CONNECTOR_WIDTH}px;background:${BOOK_SPRING_COLOR}"
+          ></div>
         </div>
       `).join('')}
     </div>`;
@@ -320,13 +323,9 @@ export function renderPokedex(
       >
         <div
           data-book-root
-          class="relative h-full overflow-visible rounded-[30px] border border-amber-950/20 bg-[linear-gradient(135deg,#cb9550_0%,#b77a37_45%,#9a622c_100%)] shadow-[0_32px_90px_rgba(15,23,42,0.34)]"
-          style="padding:${BOOK_PADDING}px"
+          class="relative h-full overflow-visible rounded-[30px] shadow-[0_32px_90px_rgba(15,23,42,0.34)]"
+          style="padding:${BOOK_PADDING}px;background:${BOOK_COVER_COLOR}"
         >
-          <div class="pointer-events-none absolute inset-y-3 left-1/2 hidden w-4 -translate-x-1/2 rounded-full bg-[linear-gradient(180deg,rgba(97,57,23,0.98),rgba(61,35,16,0.98),rgba(97,57,23,0.98))] lg:block"></div>
-          <div class="pointer-events-none absolute inset-x-16 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.2),transparent_70%)]"></div>
-          <div class="absolute left-8 top-0 h-16 w-12 rounded-b-[18px] shadow-sm" style="background:${mainColor}"></div>
-
           <div data-book-spread class="relative grid h-full grid-cols-2 overflow-visible [perspective:1800px]" style="gap:${PAGE_GAP}px">
             <section data-book-page="left" class="relative h-full overflow-hidden rounded-[24px] border border-amber-950/10 bg-[#f8f0db] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] [backface-visibility:hidden] [transform-origin:right_center]">
               <div class="pointer-events-none absolute inset-0 opacity-40 [background-image:linear-gradient(to_bottom,transparent_33px,rgba(148,163,184,0.14)_34px)] [background-size:100%_34px]"></div>
@@ -499,23 +498,20 @@ export function renderPokedex(
               </div>
               ${renderPageRings('left')}
             </section>
+
+            ${renderCoverSpringConnectors()}
           </div>
 
           <div data-book-covers class="pointer-events-none absolute inset-0 z-20">
             <div
               data-book-cover="left"
-              class="absolute left-0 top-0 h-full w-1/2 overflow-hidden rounded-l-[30px] border-r-2 border-[#121212] bg-[#F0C020] shadow-[0px_4px_8px_0px_rgba(0,0,0,0.3)]"
+              class="absolute left-0 top-0 h-full w-1/2 overflow-hidden rounded-l-[30px]"
               style="transform-origin:right center;transform-style:preserve-3d;transform:rotateY(0deg);z-index:30;"
             >
               <div
-                class="relative flex h-full items-center justify-center rounded-l-[30px] bg-[#F0C020]"
-                style="backface-visibility:hidden;"
+                class="relative h-full rounded-l-[30px]"
+                style="background:${BOOK_COVER_COLOR};backface-visibility:hidden;"
               >
-                <div class="flex flex-col items-center gap-2">
-                  <div class="h-24 w-1 bg-[#121212]"></div>
-                  <p class="text-xs font-black uppercase tracking-[0.28em] text-[#121212]">Pokedex</p>
-                </div>
-                ${renderCoverRings('left')}
               </div>
               <div
                 class="absolute inset-0 rounded-r-[30px] bg-white"
@@ -525,18 +521,13 @@ export function renderPokedex(
 
             <div
               data-book-cover="right"
-              class="absolute right-0 top-0 h-full w-1/2 overflow-hidden rounded-r-[30px] border-l-2 border-[#121212] bg-[#F0C020] shadow-[0px_4px_8px_0px_rgba(0,0,0,0.3)]"
+              class="absolute right-0 top-0 h-full w-1/2 overflow-hidden rounded-r-[30px]"
               style="transform-origin:left center;transform-style:preserve-3d;transform:rotateY(0deg);z-index:30;"
             >
               <div
-                class="relative flex h-full items-center justify-center rounded-r-[30px] bg-[#F0C020]"
-                style="backface-visibility:hidden;"
+                class="relative h-full rounded-r-[30px]"
+                style="background:${BOOK_COVER_COLOR};backface-visibility:hidden;"
               >
-                <div class="flex flex-col items-center gap-2">
-                  <div class="h-24 w-1 bg-[#121212]"></div>
-                  <p class="text-xs font-black uppercase tracking-[0.28em] text-[#121212]">Archive</p>
-                </div>
-                ${renderCoverRings('right')}
               </div>
               <div
                 class="absolute inset-0 rounded-l-[30px] bg-white"
