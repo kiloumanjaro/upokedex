@@ -1,6 +1,7 @@
 // Renders Pokémon card HTML, injects type badges into cards, and shows skeleton placeholders
 import { imageUrl, BATCH_SIZE } from '../config/app.config.js';
 import { TYPE_BG } from '../constants/typeColors.js';
+import { getEvolutionStage } from '../lib/services/pokemonService.js';
 import { formatId } from '../utils/formatId.js';
 import { capitalize } from '../utils/capitalize.js';
 import { escapeHtml } from '../utils/escapeHtml.js';
@@ -12,6 +13,7 @@ export function cardHTML({ id, name }, idx) {
   return `
     <div class="poke-card" data-id="${id}"
          style="animation-delay:${delay}ms" tabindex="0">
+      <div class="evolution-badge" id="evo-${id}"></div>
       <div class="card-img-wrap">
         <div class="card-img-bg" id="cbg-${id}"></div>
         <img src="${imageUrl(id)}" alt="${escapeHtml(name)}" width="110" height="110"
@@ -39,6 +41,21 @@ export function injectTypes(id) {
   ).join('');
   const bg = document.getElementById(`cbg-${id}`);
   if (bg) bg.style.background = TYPE_BG[types[0]] ?? '#aaa';
+  injectEvolutionStage(id);
+}
+
+async function injectEvolutionStage(id) {
+  const badge = document.getElementById(`evo-${id}`);
+  if (!badge) return;
+
+  const stage = await getEvolutionStage(id);
+  if (!badge.isConnected || stage == null) return;
+
+  const colorStage = Math.min(stage, 4);
+  badge.textContent = String(stage);
+  badge.className = `evolution-badge is-ready stage-${colorStage}`;
+  badge.setAttribute('aria-label', `Evolution stage ${stage}`);
+  badge.setAttribute('title', `Evolution stage ${stage}`);
 }
 
 export function showSkeletons(container) {

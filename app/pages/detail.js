@@ -1,8 +1,8 @@
 // Detail view: renders the book-style Pokemon notebook inside the modal
 import {
-  renderPokemonNotebook,
-  hydratePokemonNotebook,
-} from '../../components/pokemonNotebook.js';
+  renderPokedex,
+  hydratePokedex,
+} from '../../components/pokedex.js';
 import { getPokemon, getSpecies, calcWeaknesses } from '../../lib/services/pokemonService.js';
 import { getTotalCount } from '../../hooks/usePagination.js';
 
@@ -39,9 +39,9 @@ export async function loadDetail(id, contentEl, handlers = {}) {
   try {
     const detailState = await fetchDetailState(id);
     if (requestId !== activeDetailRequest) return;
-    contentEl.innerHTML = renderPokemonNotebook(detailState);
+    contentEl.innerHTML = renderPokedex(detailState);
 
-    hydratePokemonNotebook(contentEl, handlers);
+    hydratePokedex(contentEl, handlers);
     contentEl.dataset.detailLoading = 'false';
 
   } catch (e) {

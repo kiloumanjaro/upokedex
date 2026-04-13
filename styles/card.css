@@ -11,33 +11,45 @@
   border: 2px solid var(--fg);
   border-radius: 0;
   overflow: visible;
-  box-shadow: 6px 6px 0px 0px #121212;
   cursor: pointer;
-  transition: transform .2s ease-out, box-shadow .2s ease-out;
+  transition: transform .2s ease-out;
   animation: fadeUp .3s ease both;
   position: relative;
 }
 .poke-card:hover {
   transform: translateY(-4px);
-  box-shadow: 8px 8px 0px 0px #121212;
 }
 .poke-card:active {
   transform: translate(2px, 2px);
-  box-shadow: 3px 3px 0px 0px #121212;
 }
 
-/* Geometric corner decoration — cycles red/blue/yellow */
-.poke-card::after {
-  content: '';
+.evolution-badge {
   position: absolute;
-  top: 8px; right: 8px;
-  width: 10px; height: 10px;
+  top: 0;
+  right: 0;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-left: 2px solid var(--fg);
+  border-bottom: 2px solid var(--fg);
+  color: var(--fg);
+  font-size: .82rem;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0;
   pointer-events: none;
   z-index: 2;
+  transition: opacity .15s ease-out;
 }
-.poke-card:nth-child(3n+1)::after { background: var(--red); }
-.poke-card:nth-child(3n+2)::after { background: var(--blue); }
-.poke-card:nth-child(3n)::after   { background: var(--yellow); border: 1px solid #121212; }
+.evolution-badge.is-ready { opacity: 1; }
+.evolution-badge.stage-1 { background: #0ace82; }
+.evolution-badge.stage-2 { background: #ffda2a; }
+.evolution-badge.stage-3 { background: #a875f4; color: #fff; }
+.evolution-badge.stage-4 { background: #ff7261; }
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
@@ -104,7 +116,6 @@
   border: 2px solid var(--fg);
   border-radius: 0;
   overflow: hidden;
-  box-shadow: 6px 6px 0px 0px #121212;
 }
 .skel {
   background: linear-gradient(90deg, #e8e8e8 25%, #d4d4d4 50%, #e8e8e8 75%);
@@ -127,7 +138,6 @@
   color: var(--fg);
   background: var(--card);
   border: 2px solid var(--fg);
-  box-shadow: 4px 4px 0px 0px #121212;
 }
 .empty-state svg { opacity: .3; margin-bottom: 14px; }
 .empty-state p   {
@@ -142,7 +152,6 @@
   text-align: center;
   padding: 40px;
   border: 2px solid var(--fg);
-  box-shadow: 4px 4px 0px 0px #121212;
 }
 .error-state p {
   color: var(--red);

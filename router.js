@@ -62,6 +62,7 @@ function hideDetailImmediate() {
   currentId = null;
   isDetailClosing = false;
   if (contentEl) {
+    contentEl.__pokedexClose = null;
     contentEl.__pokemonNotebookClose = null;
     contentEl.dataset.bookSessionOpen = 'false';
     contentEl.dataset.detailLoading = 'false';
@@ -76,6 +77,11 @@ function requestHideDetail() {
   const finishClose = () => {
     hideDetailImmediate();
   };
+
+  if (typeof contentEl?.__pokedexClose === 'function') {
+    contentEl.__pokedexClose(finishClose);
+    return;
+  }
 
   if (typeof contentEl?.__pokemonNotebookClose === 'function') {
     contentEl.__pokemonNotebookClose(finishClose);

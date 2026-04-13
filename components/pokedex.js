@@ -6,11 +6,15 @@ import { escapeHtml } from '../utils/escapeHtml.js';
 import { FALLBACK_IMAGE } from '../utils/fallbackImage.js';
 import { formatId } from '../utils/formatId.js';
 
-const BOOK_WIDTH = 1120;
-const BOOK_HEIGHT = 720;
+const BOOK_WIDTH = 968;
+const BOOK_HEIGHT = 650;
+const PAGE_WIDTH = 472;
+const PAGE_GAP = 8;
+const BOOK_PADDING = 8;
 const BOOK_OPEN_DURATION = 800;
 const BOOK_CLOSE_DURATION = 1800;
 const PAGE_FLIP_DURATION = 600;
+const PAGE_FLIP_CLEANUP_DELAY = 610;
 let activeFit = null;
 let resizeBound = false;
 
@@ -266,7 +270,7 @@ function chevronIcon(direction) {
     </svg>`;
 }
 
-export function renderPokemonNotebook({
+export function renderPokedex({
   id,
   totalCount = 0,
   pokemon,
@@ -295,7 +299,7 @@ export function renderPokemonNotebook({
   ];
 
   return `
-    <div data-book-stage class="mx-auto flex h-[min(82vh,760px)] w-full items-center justify-center overflow-hidden px-1 py-1 text-slate-900">
+    <div data-book-stage class="mx-auto flex h-[min(82vh,700px)] w-full items-center justify-center overflow-hidden px-1 py-1 text-slate-900">
       <button
         type="button"
         data-book-action="previous"
@@ -310,7 +314,8 @@ export function renderPokemonNotebook({
       <div data-book-shell class="relative origin-center" style="width:${BOOK_WIDTH}px;height:${BOOK_HEIGHT}px">
         <div
           data-book-root
-          class="relative h-full overflow-hidden rounded-[30px] border border-amber-950/20 bg-[linear-gradient(135deg,#cb9550_0%,#b77a37_45%,#9a622c_100%)] p-3 shadow-[0_32px_90px_rgba(15,23,42,0.34)]"
+          class="relative h-full overflow-hidden rounded-[30px] border border-amber-950/20 bg-[linear-gradient(135deg,#cb9550_0%,#b77a37_45%,#9a622c_100%)] shadow-[0_32px_90px_rgba(15,23,42,0.34)]"
+          style="padding:${BOOK_PADDING}px"
         >
           <div class="pointer-events-none absolute inset-y-3 left-1/2 hidden w-4 -translate-x-1/2 rounded-full bg-[linear-gradient(180deg,rgba(97,57,23,0.98),rgba(61,35,16,0.98),rgba(97,57,23,0.98))] lg:block"></div>
           <div class="pointer-events-none absolute inset-x-16 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.2),transparent_70%)]"></div>
@@ -325,7 +330,7 @@ export function renderPokemonNotebook({
             ${closeIcon()}
           </button>
 
-          <div data-book-spread class="grid h-full grid-cols-2 gap-3 [perspective:1800px]">
+          <div data-book-spread class="grid h-full grid-cols-2 [perspective:1800px]" style="gap:${PAGE_GAP}px">
             <section data-book-page="left" class="relative h-full overflow-hidden rounded-[24px] border border-amber-950/10 bg-[#f8f0db] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] [backface-visibility:hidden] [transform-origin:right_center]">
               <div class="pointer-events-none absolute inset-0 opacity-40 [background-image:linear-gradient(to_bottom,transparent_33px,rgba(148,163,184,0.14)_34px)] [background-size:100%_34px]"></div>
               <div class="relative flex h-full flex-col gap-3">
@@ -702,18 +707,18 @@ function buildFlipOverlayFromPages(root, action, frontPage, backPage) {
   const overlay = document.createElement('div');
   overlay.setAttribute('data-book-flip-overlay', action);
   overlay.className = 'absolute top-0';
-  overlay.style.width = '472px';
+  overlay.style.width = `${PAGE_WIDTH}px`;
   overlay.style.height = '100%';
   overlay.style.transformStyle = 'preserve-3d';
   overlay.style.willChange = 'transform';
   overlay.style.zIndex = '20';
 
   if (action === 'next') {
-    overlay.style.right = '8px';
+    overlay.style.right = '0px';
     overlay.style.transformOrigin = '0px 50%';
   } else {
-    overlay.style.left = '8px';
-    overlay.style.transformOrigin = '472px 50%';
+    overlay.style.left = '0px';
+    overlay.style.transformOrigin = `${PAGE_WIDTH}px 50%`;
   }
 
   const frontFace = frontPage;
@@ -735,6 +740,14 @@ function buildFlipOverlayFromPages(root, action, frontPage, backPage) {
   overlay.append(frontFace, backFace);
   spread.appendChild(overlay);
   return overlay;
+}
+
+function replaceNotebookPage(bookRoot, side, replacementPage) {
+  const currentPage = bookRoot?.querySelector(`[data-book-page="${side}"]`);
+  if (!currentPage || !replacementPage) return null;
+
+  currentPage.replaceWith(replacementPage);
+  return bookRoot.querySelector(`[data-book-page="${side}"]`);
 }
 
 function fitNotebook(root) {
@@ -823,7 +836,7 @@ function animatePageTurn(root, action, onComplete) {
     root.dataset.turning = 'false';
     target.style.visibility = '';
     onComplete();
-  }, PAGE_FLIP_DURATION + 10);
+  }, PAGE_FLIP_CLEANUP_DELAY);
 }
 
 function isNotebookTurnPayload(value) {
@@ -837,48 +850,54 @@ function isNotebookTurnPayload(value) {
 }
 
 function transitionNotebookTurn(root, action, payload) {
+  const sourceSide = action === 'next' ? 'right' : 'left';
+  const heldSide = action === 'next' ? 'left' : 'right';
   const currentBookRoot = root.querySelector('[data-book-root]');
   const sourcePage = currentBookRoot?.querySelector(
-    `[data-book-page="${action === 'next' ? 'right' : 'left'}"]`
+    `[data-book-page="${sourceSide}"]`
+  )?.cloneNode(true);
+  const heldPage = currentBookRoot?.querySelector(
+    `[data-book-page="${heldSide}"]`
   )?.cloneNode(true);
 
-  if (!sourcePage) {
+  if (!sourcePage || !heldPage) {
     root.dataset.detailLoading = 'false';
-    root.innerHTML = renderPokemonNotebook(payload.detail);
+    root.innerHTML = renderPokedex(payload.detail);
     root.dataset.bookSessionOpen = 'true';
-    hydratePokemonNotebook(root, payload.handlers);
+    hydratePokedex(root, payload.handlers);
     return;
   }
 
   const temp = document.createElement('div');
-  temp.innerHTML = renderPokemonNotebook(payload.detail);
+  temp.innerHTML = renderPokedex(payload.detail);
   const nextStage = temp.querySelector('[data-book-stage]');
   const nextBookRoot = nextStage?.querySelector('[data-book-root]');
   const backPage = nextBookRoot?.querySelector(
-    `[data-book-page="${action === 'next' ? 'left' : 'right'}"]`
+    `[data-book-page="${heldSide}"]`
+  )?.cloneNode(true);
+  const finalHeldPage = nextBookRoot?.querySelector(
+    `[data-book-page="${heldSide}"]`
   )?.cloneNode(true);
 
-  if (!nextStage || !backPage) {
+  if (!nextStage || !backPage || !finalHeldPage) {
     root.dataset.detailLoading = 'false';
-    root.innerHTML = renderPokemonNotebook(payload.detail);
+    root.innerHTML = renderPokedex(payload.detail);
     root.dataset.bookSessionOpen = 'true';
-    hydratePokemonNotebook(root, payload.handlers);
+    hydratePokedex(root, payload.handlers);
     return;
   }
 
   root.dataset.bookSessionOpen = 'true';
   root.innerHTML = nextStage.outerHTML;
-  hydratePokemonNotebook(root, payload.handlers);
+  hydratePokedex(root, payload.handlers);
 
   const activeBookRoot = root.querySelector('[data-book-root]');
-  const target = activeBookRoot?.querySelector(
-    `[data-book-page="${action === 'next' ? 'right' : 'left'}"]`
-  );
   const spread = activeBookRoot?.querySelector('[data-book-spread]');
+  const activeHeldPage = replaceNotebookPage(activeBookRoot, heldSide, heldPage);
   const overlay = buildFlipOverlayFromPages(activeBookRoot, action, sourcePage, backPage);
   const turningNext = action === 'next';
 
-  if (!activeBookRoot || !target || !spread || !overlay) {
+  if (!activeBookRoot || !activeHeldPage || !spread || !overlay) {
     root.dataset.detailLoading = 'false';
     root.dataset.turning = 'false';
     return;
@@ -887,7 +906,6 @@ function transitionNotebookTurn(root, action, payload) {
   root.dataset.detailLoading = 'false';
   root.dataset.turning = 'true';
   pulseSpineRings(activeBookRoot, action);
-  target.style.visibility = 'hidden';
 
   overlay.animate(
     turningNext
@@ -920,9 +938,9 @@ function transitionNotebookTurn(root, action, payload) {
 
   window.setTimeout(() => {
     if (overlay.isConnected) overlay.remove();
-    target.style.visibility = '';
+    replaceNotebookPage(activeBookRoot, heldSide, finalHeldPage);
     root.dataset.turning = 'false';
-  }, PAGE_FLIP_DURATION + 10);
+  }, PAGE_FLIP_CLEANUP_DELAY);
 }
 
 function animateNavButton(button) {
@@ -939,7 +957,7 @@ function animateNavButton(button) {
   );
 }
 
-export function hydratePokemonNotebook(root, handlers = {}) {
+export function hydratePokedex(root, handlers = {}) {
   root.dataset.turning = 'false';
   root.dataset.detailLoading = 'false';
   root.dataset.bookClosing = 'false';
@@ -968,6 +986,10 @@ export function hydratePokemonNotebook(root, handlers = {}) {
   }
 
   root.__pokemonNotebookClose = onComplete => {
+    animateBookClose(root, onComplete);
+  };
+
+  root.__pokedexClose = onComplete => {
     animateBookClose(root, onComplete);
   };
 
@@ -1040,3 +1062,8 @@ export function hydratePokemonNotebook(root, handlers = {}) {
     });
   });
 }
+
+export {
+  renderPokedex as renderPokemonNotebook,
+  hydratePokedex as hydratePokemonNotebook,
+};

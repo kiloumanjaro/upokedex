@@ -29,13 +29,11 @@
   background: var(--card);
   outline: none;
   color: var(--text);
-  box-shadow: 3px 3px 0px 0px #121212;
-  transition: box-shadow .15s ease-out, border-color .15s ease-out;
+  transition: border-color .15s ease-out;
 }
 #searchInput::placeholder { color: #9ca3af; font-weight: 400; }
 #searchInput:focus {
   border-color: var(--blue);
-  box-shadow: 4px 4px 0px 0px var(--blue);
 }
 
 .sort-wrap { display: flex; gap: 8px; align-items: center; }
@@ -58,19 +56,16 @@
   letter-spacing: .08em;
   color: var(--fg);
   cursor: pointer;
-  box-shadow: 3px 3px 0px 0px #121212;
-  transition: transform .15s ease-out, box-shadow .15s ease-out, background .1s;
+  transition: transform .15s ease-out, background .1s, border-color .15s ease-out;
 }
 .sort-btn:hover:not(.active) { background: var(--yellow); }
 .sort-btn.active {
   background: var(--fg);
   border-color: var(--fg);
   color: #fff;
-  box-shadow: 3px 3px 0px 0px var(--red);
 }
 .sort-btn:active {
   transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0px 0px #121212;
 }
 
 #resultsCount {
@@ -84,7 +79,6 @@
   background: var(--yellow);
   border: 2px solid var(--border);
   display: inline-block;
-  box-shadow: 3px 3px 0px 0px #121212;
 }
 
 #loadMoreWrap {
