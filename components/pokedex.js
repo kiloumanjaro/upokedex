@@ -11,8 +11,6 @@ const BOOK_HEIGHT = 650;
 const PAGE_WIDTH = 472;
 const PAGE_GAP = 8;
 const BOOK_PADDING = 8;
-const BOOK_OPEN_DURATION = 800;
-const BOOK_CLOSE_DURATION = 1800;
 const PAGE_FLIP_DURATION = 600;
 const PAGE_FLIP_CLEANUP_DELAY = 610;
 let activeFit = null;
@@ -578,93 +576,11 @@ function setCoverVisibility(root, visible) {
   covers.style.visibility = visible ? 'visible' : 'hidden';
 }
 
-function animateBookOpen(root) {
-  const leftCover = root.querySelector('[data-book-cover="left"]');
-  const rightCover = root.querySelector('[data-book-cover="right"]');
-  if (!leftCover || !rightCover) return;
-
-  root.dataset.bookOpening = 'true';
-  setCoverVisibility(root, true);
-  leftCover.animate(
-    [
-      { transform: 'rotateY(0deg)', zIndex: 30 },
-      { transform: 'rotateY(-180deg)', zIndex: 10 },
-    ],
-    {
-      duration: BOOK_OPEN_DURATION,
-      easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
-      fill: 'forwards',
-    }
-  );
-  rightCover.animate(
-    [
-      { transform: 'rotateY(0deg)', zIndex: 30 },
-      { transform: 'rotateY(180deg)', zIndex: 10 },
-    ],
-    {
-      duration: BOOK_OPEN_DURATION,
-      easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
-      fill: 'forwards',
-    }
-  );
-
-  window.setTimeout(() => {
-    root.dataset.bookOpening = 'false';
-    root.dataset.bookSessionOpen = 'true';
-    setCoverState(root, 'open');
-    setCoverVisibility(root, false);
-  }, BOOK_OPEN_DURATION);
-}
-
 function openBookImmediate(root) {
   root.dataset.bookOpening = 'false';
   root.dataset.bookSessionOpen = 'true';
   setCoverState(root, 'open');
   setCoverVisibility(root, false);
-}
-
-function animateBookClose(root, onComplete) {
-  if (root.dataset.bookClosing === 'true') return;
-
-  const leftCover = root.querySelector('[data-book-cover="left"]');
-  const rightCover = root.querySelector('[data-book-cover="right"]');
-  if (!leftCover || !rightCover) {
-    if (typeof onComplete === 'function') onComplete();
-    return;
-  }
-
-  root.dataset.bookClosing = 'true';
-  setCoverVisibility(root, true);
-  setCoverState(root, 'open');
-  leftCover.animate(
-    [
-      { transform: 'rotateY(-180deg)', zIndex: 10 },
-      { transform: 'rotateY(0deg)', zIndex: 30 },
-    ],
-    {
-      duration: BOOK_CLOSE_DURATION,
-      easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
-      fill: 'forwards',
-    }
-  );
-  rightCover.animate(
-    [
-      { transform: 'rotateY(180deg)', zIndex: 10 },
-      { transform: 'rotateY(0deg)', zIndex: 30 },
-    ],
-    {
-      duration: BOOK_CLOSE_DURATION,
-      easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
-      fill: 'forwards',
-    }
-  );
-
-  window.setTimeout(() => {
-    root.dataset.bookClosing = 'false';
-    root.dataset.bookSessionOpen = 'false';
-    setCoverState(root, 'closed');
-    if (typeof onComplete === 'function') onComplete();
-  }, BOOK_CLOSE_DURATION);
 }
 
 function pulseSpineRings(root, action) {
@@ -989,11 +905,17 @@ export function hydratePokedex(root, handlers = {}) {
   }
 
   root.__pokemonNotebookClose = onComplete => {
-    animateBookClose(root, onComplete);
+    root.dataset.bookClosing = 'false';
+    root.dataset.bookSessionOpen = 'false';
+    setCoverVisibility(root, false);
+    if (typeof onComplete === 'function') onComplete();
   };
 
   root.__pokedexClose = onComplete => {
-    animateBookClose(root, onComplete);
+    root.dataset.bookClosing = 'false';
+    root.dataset.bookSessionOpen = 'false';
+    setCoverVisibility(root, false);
+    if (typeof onComplete === 'function') onComplete();
   };
 
   root.querySelectorAll('[data-book-action]').forEach(button => {
