@@ -616,6 +616,13 @@ function animateBookOpen(root) {
   }, BOOK_OPEN_DURATION);
 }
 
+function openBookImmediate(root) {
+  root.dataset.bookOpening = 'false';
+  root.dataset.bookSessionOpen = 'true';
+  setCoverState(root, 'open');
+  setCoverVisibility(root, false);
+}
+
 function animateBookClose(root, onComplete) {
   if (root.dataset.bookClosing === 'true') return;
 
@@ -713,12 +720,19 @@ function buildFlipOverlayFromPages(root, action, frontPage, backPage) {
   overlay.style.willChange = 'transform';
   overlay.style.zIndex = '20';
 
+  const flipper = document.createElement('div');
+  flipper.setAttribute('data-book-flip-surface', '');
+  flipper.style.position = 'absolute';
+  flipper.style.inset = '0';
+  flipper.style.transformStyle = 'preserve-3d';
+  flipper.style.willChange = 'transform';
+
   if (action === 'next') {
     overlay.style.right = '0px';
-    overlay.style.transformOrigin = '0px 50%';
+    flipper.style.transformOrigin = '0px 50%';
   } else {
     overlay.style.left = '0px';
-    overlay.style.transformOrigin = `${PAGE_WIDTH}px 50%`;
+    flipper.style.transformOrigin = `${PAGE_WIDTH}px 50%`;
   }
 
   const frontFace = frontPage;
@@ -729,15 +743,18 @@ function buildFlipOverlayFromPages(root, action, frontPage, backPage) {
   frontFace.style.width = '100%';
   frontFace.style.height = '100%';
   frontFace.style.backfaceVisibility = 'hidden';
+  frontFace.style.transformOrigin = '50% 50%';
 
   backFace.style.position = 'absolute';
   backFace.style.inset = '0';
   backFace.style.width = '100%';
   backFace.style.height = '100%';
   backFace.style.backfaceVisibility = 'hidden';
+  backFace.style.transformOrigin = '50% 50%';
   backFace.style.transform = 'rotateY(180deg)';
 
-  overlay.append(frontFace, backFace);
+  flipper.append(frontFace, backFace);
+  overlay.appendChild(flipper);
   spread.appendChild(overlay);
   return overlay;
 }
@@ -764,72 +781,91 @@ function fitNotebook(root) {
   shell.style.transform = `scale(${Math.min(widthScale, heightScale, 1)})`;
 }
 
+function getPageTurnRotationKeyframes(action) {
+  return action === 'next'
+    ? [
+        { transform: 'rotateY(0deg)' },
+        { transform: 'rotateY(-180deg)' },
+      ]
+    : [
+        { transform: 'rotateY(0deg)' },
+        { transform: 'rotateY(180deg)' },
+      ];
+}
+
+function getPageTurnShiftKeyframes(action) {
+  const shift = action === 'next' ? -PAGE_GAP : PAGE_GAP;
+
+  return [
+    { transform: 'translateX(0px)', offset: 0 },
+    { transform: `translateX(${shift}px)`, offset: 0.5 },
+    { transform: `translateX(${shift}px)`, offset: 1 },
+  ];
+}
+
+function getCombinedPageTurnKeyframes(action) {
+  const shift = action === 'next' ? -PAGE_GAP : PAGE_GAP;
+
+  return action === 'next'
+    ? [
+        { transform: 'translateX(0px) rotateY(0deg)', offset: 0 },
+        { transform: `translateX(${shift}px) rotateY(-90deg)`, offset: 0.5 },
+        { transform: `translateX(${shift}px) rotateY(-180deg)`, offset: 1 },
+      ]
+    : [
+        { transform: 'translateX(0px) rotateY(0deg)', offset: 0 },
+        { transform: `translateX(${shift}px) rotateY(90deg)`, offset: 0.5 },
+        { transform: `translateX(${shift}px) rotateY(180deg)`, offset: 1 },
+      ];
+}
+
+function animateTurningPage(action, rotationTarget, shiftTarget = rotationTarget) {
+  if (!rotationTarget) return;
+
+  if (rotationTarget === shiftTarget) {
+    rotationTarget.animate(getCombinedPageTurnKeyframes(action), {
+      duration: PAGE_FLIP_DURATION,
+      easing: 'cubic-bezier(0.4, 0, 1, 1)',
+      fill: 'forwards',
+    });
+    return;
+  }
+
+  rotationTarget.animate(getPageTurnRotationKeyframes(action), {
+    duration: PAGE_FLIP_DURATION,
+    easing: 'cubic-bezier(0.4, 0, 1, 1)',
+    fill: 'forwards',
+  });
+
+  shiftTarget?.animate(getPageTurnShiftKeyframes(action), {
+    duration: PAGE_FLIP_DURATION,
+    easing: 'ease-in-out',
+    fill: 'forwards',
+  });
+}
+
 function animatePageTurn(root, action, onComplete) {
   const target =
     action === 'next'
       ? root.querySelector('[data-book-page="right"]')
       : root.querySelector('[data-book-page="left"]');
-  const spread = root.querySelector('[data-book-spread]');
 
-  if (!target || !spread || typeof onComplete !== 'function') {
+  if (!target || typeof onComplete !== 'function') {
     if (typeof onComplete === 'function') onComplete();
     return;
   }
 
-  const turningNext = action === 'next';
   const overlay = buildFlipOverlay(root, action);
+  const flipSurface = overlay?.querySelector('[data-book-flip-surface]');
   root.dataset.turning = 'true';
   pulseSpineRings(root, action);
 
-  target.style.visibility = 'hidden';
-
-  if (overlay) {
-    overlay.animate(
-      turningNext
-        ? [
-            { transform: 'rotateY(0deg)' },
-            { transform: 'rotateY(-180deg)' },
-          ]
-        : [
-            { transform: 'rotateY(0deg)' },
-            { transform: 'rotateY(180deg)' },
-          ],
-      {
-        duration: PAGE_FLIP_DURATION,
-        easing: 'cubic-bezier(0.4, 0, 1, 1)',
-        fill: 'forwards',
-      }
-    );
+  if (overlay && flipSurface) {
+    target.style.visibility = 'hidden';
+    animateTurningPage(action, flipSurface, overlay);
   } else {
-    target.animate(
-      turningNext
-        ? [
-            { transform: 'rotateY(0deg)' },
-            { transform: 'rotateY(-180deg)' },
-          ]
-        : [
-            { transform: 'rotateY(0deg)' },
-            { transform: 'rotateY(180deg)' },
-          ],
-      {
-        duration: PAGE_FLIP_DURATION,
-        easing: 'cubic-bezier(0.4, 0, 1, 1)',
-        fill: 'forwards',
-      }
-    );
+    animateTurningPage(action, target);
   }
-
-  spread.animate(
-    [
-      { transform: 'translateX(0px)' },
-      { transform: `translateX(${turningNext ? '-8px' : '8px'})` },
-      { transform: 'translateX(0px)' },
-    ],
-    {
-      duration: PAGE_FLIP_DURATION,
-      easing: 'ease-in-out',
-    }
-  );
 
   window.setTimeout(() => {
     if (overlay?.isConnected) overlay.remove();
@@ -892,12 +928,11 @@ function transitionNotebookTurn(root, action, payload) {
   hydratePokedex(root, payload.handlers);
 
   const activeBookRoot = root.querySelector('[data-book-root]');
-  const spread = activeBookRoot?.querySelector('[data-book-spread]');
   const activeHeldPage = replaceNotebookPage(activeBookRoot, heldSide, heldPage);
   const overlay = buildFlipOverlayFromPages(activeBookRoot, action, sourcePage, backPage);
-  const turningNext = action === 'next';
+  const flipSurface = overlay?.querySelector('[data-book-flip-surface]');
 
-  if (!activeBookRoot || !activeHeldPage || !spread || !overlay) {
+  if (!activeBookRoot || !activeHeldPage || !overlay || !flipSurface) {
     root.dataset.detailLoading = 'false';
     root.dataset.turning = 'false';
     return;
@@ -907,34 +942,7 @@ function transitionNotebookTurn(root, action, payload) {
   root.dataset.turning = 'true';
   pulseSpineRings(activeBookRoot, action);
 
-  overlay.animate(
-    turningNext
-      ? [
-          { transform: 'rotateY(0deg)' },
-          { transform: 'rotateY(-180deg)' },
-        ]
-      : [
-          { transform: 'rotateY(0deg)' },
-          { transform: 'rotateY(180deg)' },
-        ],
-    {
-      duration: PAGE_FLIP_DURATION,
-      easing: 'cubic-bezier(0.4, 0, 1, 1)',
-      fill: 'forwards',
-    }
-  );
-
-  spread.animate(
-    [
-      { transform: 'translateX(0px)' },
-      { transform: `translateX(${turningNext ? '-8px' : '8px'})` },
-      { transform: 'translateX(0px)' },
-    ],
-    {
-      duration: PAGE_FLIP_DURATION,
-      easing: 'ease-in-out',
-    }
-  );
+  animateTurningPage(action, flipSurface, overlay);
 
   window.setTimeout(() => {
     if (overlay.isConnected) overlay.remove();
@@ -961,6 +969,7 @@ export function hydratePokedex(root, handlers = {}) {
   root.dataset.turning = 'false';
   root.dataset.detailLoading = 'false';
   root.dataset.bookClosing = 'false';
+  root.dataset.bookOpening = 'false';
 
   if (!resizeBound) {
     window.addEventListener('resize', () => {
@@ -976,13 +985,7 @@ export function hydratePokedex(root, handlers = {}) {
     setCoverState(root, 'open');
     setCoverVisibility(root, false);
   } else {
-    setCoverState(root, 'closed');
-    setCoverVisibility(root, true);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        animateBookOpen(root);
-      });
-    });
+    openBookImmediate(root);
   }
 
   root.__pokemonNotebookClose = onComplete => {
