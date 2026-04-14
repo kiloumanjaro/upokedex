@@ -29,11 +29,13 @@ export function initModal(handlers) {
 export function open() {
   overlayEl.classList.add('open');
   document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
 }
 
 export function close() {
   overlayEl.classList.remove('open');
   document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
 }
 
 export function scrollToTop() {

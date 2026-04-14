@@ -21,7 +21,8 @@
 
 html {
   height: 100%;
-  overflow-y: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 body {
@@ -31,7 +32,8 @@ body {
   background-size: 24px 24px;
   color: var(--text);
   min-height: 100%;
-  overflow-y: auto;
+  overflow-y: visible;
+  overflow-x: hidden;
 }
 
 .container {
@@ -44,16 +46,19 @@ body {
 
 .home-content {
   flex: 1;
-  padding: 28px 20px 0;
+  padding: 28px 20px calc(24px + var(--home-footer-height));
+}
+
+.card-grid {
+  overflow: hidden !important;
 }
 
 @media (max-width: 540px) {
-  .home-content { padding: 20px 12px 0; }
+  .home-content { padding: 20px 12px calc(20px + var(--home-footer-height)); }
 }
 
 @media (min-width: 541px) {
-  html,
-  body {
+  html {
     overflow-x: hidden;
   }
 }

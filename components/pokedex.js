@@ -375,9 +375,9 @@ export function renderPokedex(
                 </div>
 
                 <div class="pokedex-metrics">
-                  ${renderMetricCard("Height", formatHeight(pokemon.height), mainColor)}
-                  ${renderMetricCard("Weight", formatWeight(pokemon.weight), mainColor)}
-                  ${renderMetricCard("Stat Total", String(statTotal), mainColor)}
+                  ${renderMetricCard("Height", formatHeight(pokemon.height), "#121212")}
+                  ${renderMetricCard("Weight", formatWeight(pokemon.weight), "#121212")}
+                  ${renderMetricCard("Stat Total", String(statTotal), "#121212")}
                 </div>
 
                 <div class="pokedex-notes">
