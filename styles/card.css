@@ -48,7 +48,7 @@
 .evolution-badge.is-ready { opacity: 1; }
 .evolution-badge.stage-1 { background: #0ace82; }
 .evolution-badge.stage-2 { background: #ffda2a; }
-.evolution-badge.stage-3 { background: #a875f4; color: #fff; }
+.evolution-badge.stage-3 { background: #a875f4; color: #000; }
 .evolution-badge.stage-4 { background: #ff7261; }
 
 @keyframes fadeUp {

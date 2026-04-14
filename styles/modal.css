@@ -24,9 +24,7 @@
   width: 100%;
   max-width: min(1520px, calc(100vw - 16px));
   max-height: 96vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
+  overflow: visible;
   background: transparent;
   border-radius: 0;
   box-shadow: none;
