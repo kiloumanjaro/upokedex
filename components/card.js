@@ -53,7 +53,7 @@ async function injectEvolutionStage(id) {
 
   const colorStage = Math.min(stage, 4);
   badge.textContent = String(stage);
-  badge.className = `evolution-badge is-ready stage-${colorStage}`;
+  badge.className = `evolution-badge evolution-badge--visible evolution-badge--stage-${colorStage}`;
   badge.setAttribute('aria-label', `Evolution stage ${stage}`);
   badge.setAttribute('title', `Evolution stage ${stage}`);
 }
@@ -65,9 +65,9 @@ export function showSkeletons(container) {
         <div class="skel skel-img"></div>
       </div>
       <div class="skel-body">
-        <div class="skel skel-line sm"></div>
-        <div class="skel skel-line md"></div>
-        <div class="skel skel-line sm" style="width:40%"></div>
+        <div class="skel skel-line--sm"></div>
+        <div class="skel skel-line--md"></div>
+        <div class="skel skel-line--sm" style="width:40%"></div>
       </div>
     </div>`).join('');
 }

@@ -26,10 +26,10 @@ let loadAllPromise = null;
 
 export function setupHome(cardClickCallback) {
   onCardClick = cardClickCallback;
-  gridEl = document.getElementById("cardGrid");
-  countEl = document.getElementById("resultsCount");
-  loadMoreWrap = document.getElementById("loadMoreWrap");
-  loadMoreBtn = document.getElementById("loadMoreBtn");
+  gridEl = document.querySelector(".card-grid");
+  countEl = document.querySelector(".results-count");
+  loadMoreWrap = document.querySelector(".load-more-wrap");
+  loadMoreBtn = document.querySelector(".load-more-btn");
 
   setupFooterLayout();
 
@@ -57,7 +57,7 @@ export function setupHome(cardClickCallback) {
 
   // Search
   document
-    .getElementById("searchInput")
+    .querySelector(".search-input")
     .addEventListener("input", function () {
       setSearchQuery(this.value.trim());
       if (getSearchQuery()) {
@@ -73,22 +73,22 @@ export function setupHome(cardClickCallback) {
     });
 
   // Sort
-  const sortIdBtn = document.getElementById("sortId");
-  const sortNameBtn = document.getElementById("sortName");
-  const typeFilterSelect = document.getElementById("typeFilter");
+  const sortIdBtn = document.querySelector('[data-sort="id"]');
+  const sortNameBtn = document.querySelector('[data-sort="name"]');
+  const typeFilterSelect = document.querySelector(".type-filter");
   const typeFilterWrap = document.querySelector(".type-filter-wrap");
 
   sortIdBtn.addEventListener("click", () => {
     setSortMode("id");
-    sortIdBtn.classList.add("active");
-    sortNameBtn.classList.remove("active");
+    sortIdBtn.classList.add("sort-btn--active");
+    sortNameBtn.classList.remove("sort-btn--active");
     renderGrid();
   });
 
   sortNameBtn.addEventListener("click", () => {
     setSortMode("name");
-    sortNameBtn.classList.add("active");
-    sortIdBtn.classList.remove("active");
+    sortNameBtn.classList.add("sort-btn--active");
+    sortIdBtn.classList.remove("sort-btn--active");
     renderGrid();
   });
 
@@ -97,7 +97,7 @@ export function setupHome(cardClickCallback) {
   const setTypeMenuOpen = (next) => {
     typeMenuOpen = next;
     if (typeFilterWrap) {
-      typeFilterWrap.classList.toggle("open", typeMenuOpen);
+      typeFilterWrap.classList.toggle("type-filter-wrap--open", typeMenuOpen);
     }
   };
 

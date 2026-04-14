@@ -275,7 +275,7 @@ Usage rule:
 
 #### Search field
 
-Implemented by `.search-wrap` and `#searchInput`.
+Implemented by `.search-wrap` and `.search-input`.
 
 Characteristics:
 
@@ -305,7 +305,7 @@ Usage rule:
 
 #### Results count
 
-Implemented by `#resultsCount`.
+Implemented by `.results-count`.
 
 Characteristics:
 
@@ -319,7 +319,7 @@ Usage rule:
 
 #### Primary footer action
 
-Implemented by `#loadMoreWrap` and `#loadMoreBtn`.
+Implemented by `.load-more-wrap` and `.load-more-btn`.
 
 Characteristics:
 

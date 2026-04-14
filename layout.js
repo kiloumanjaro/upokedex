@@ -19,13 +19,13 @@ export function render() {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
-            <input id="searchInput" type="search" placeholder="Search name or #ID\u2026" autocomplete="off" />
+            <input class="search-input" type="search" placeholder="Search name or #ID\u2026" autocomplete="off" />
           </div>
           <div class="sort-wrap">
-            <button class="sort-btn active" id="sortId">By ID</button>
-            <button class="sort-btn" id="sortName">A \u2013 Z</button>
+            <button class="sort-btn sort-btn--active" data-sort="id">By ID</button>
+            <button class="sort-btn" data-sort="name">A \u2013 Z</button>
             <div class="type-filter-wrap">
-              <select id="typeFilter" class="type-filter">
+              <select class="type-filter">
                 <option value="">All Types</option>
                 ${typeOptions}
               </select>
@@ -33,17 +33,17 @@ export function render() {
           </div>
         </div>
 
-        <div id="resultsCount"></div>
-        <div class="card-grid" id="cardGrid"></div>
+        <div class="results-count"></div>
+        <div class="card-grid"></div>
       </div>
-      <footer id="loadMoreWrap" class="home-footer">
-        <button id="loadMoreBtn">Load More Pokemons</button>
+      <footer class="load-more-wrap home-footer">
+        <button class="load-more-btn">Load More Pokemons</button>
       </footer>
     </main>
 
-    <div class="modal-overlay" id="modalOverlay">
-      <div class="modal" id="modal" role="dialog" aria-modal="true">
-        <div id="modalContent"></div>
+    <div class="modal-overlay">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modal__content"></div>
       </div>
     </div>
   `;

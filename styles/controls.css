@@ -20,7 +20,7 @@
   pointer-events: none;
 }
 
-#searchInput {
+.search-input {
   width: 100%;
   padding: 11px 16px 11px 42px;
   border: 2px solid var(--border);
@@ -31,8 +31,8 @@
   color: var(--text);
   transition: border-color .15s ease-out;
 }
-#searchInput::placeholder { color: #9ca3af; font-weight: 400; }
-#searchInput:focus {
+.search-input::placeholder { color: #9ca3af; font-weight: 400; }
+.search-input:focus {
   border-color: var(--blue);
 }
 
@@ -77,7 +77,7 @@
   pointer-events: none;
   transition: transform .15s ease-out;
 }
-.type-filter-wrap.open::after {
+.type-filter-wrap--open::after {
   transform: rotate(180deg);
 }
 
@@ -100,10 +100,10 @@
   outline: none;
   border-color: var(--fg);
 }
-.sort-btn:hover:not(.active) { background: var(--yellow); }
-.sort-btn.active,
-.sort-btn.active:hover,
-.sort-btn.active:focus {
+.sort-btn:hover:not(.sort-btn--active) { background: var(--yellow); }
+.sort-btn--active,
+.sort-btn--active:hover,
+.sort-btn--active:focus {
   background: #0ace82;
   color: #000;
 }
@@ -111,7 +111,7 @@
   transform: translate(2px, 2px);
 }
 
-#resultsCount {
+.results-count {
   font-size: .75rem;
   font-weight: 700;
   color: var(--fg);
@@ -124,7 +124,7 @@
   display: inline-block;
 }
 
-#loadMoreWrap {
+.load-more-wrap {
   position: relative;
   isolation: isolate;
   display: flex;
@@ -137,7 +137,7 @@
   clip-path: inset(0 -100vmax);
 }
 
-#loadMoreWrap::before {
+.load-more-wrap::before {
   content: "";
   position: absolute;
   top: 0;
@@ -147,7 +147,7 @@
   border-top: 2px solid var(--border);
   pointer-events: none;
 }
-#loadMoreBtn {
+.load-more-btn {
   width: fit-content;
   margin: 0 auto;
   padding: 14px 44px;
@@ -165,14 +165,14 @@
   align-items: center;
   gap: 8px;
 }
-#loadMoreBtn:hover:not(:disabled) {
+.load-more-btn:hover:not(:disabled) {
   background: #b01c1c;
   transform: translateY(-2px);
 }
-#loadMoreBtn:active:not(:disabled) {
+.load-more-btn:active:not(:disabled) {
   transform: translate(2px, 2px);
 }
-#loadMoreBtn:disabled {
+.load-more-btn:disabled {
   background: #d1d5db;
   border-color: #9ca3af;
   box-shadow: none;
@@ -180,11 +180,11 @@
 }
 
 @media (max-width: 540px) {
-  #loadMoreWrap {
+  .load-more-wrap {
     padding: 24px 12px;
   }
 
-  #loadMoreBtn {
+  .load-more-btn {
     width: min(100%, 320px);
     justify-content: center;
   }

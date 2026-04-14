@@ -2,9 +2,9 @@
 let overlayEl, modalEl, contentEl;
 
 export function initModal(handlers) {
-  overlayEl  = document.getElementById('modalOverlay');
-  modalEl    = document.getElementById('modal');
-  contentEl  = document.getElementById('modalContent');
+  overlayEl  = document.querySelector('.modal-overlay');
+  modalEl    = document.querySelector('.modal');
+  contentEl  = document.querySelector('.modal__content');
 
   overlayEl.addEventListener('click', e => {
     if (e.target === overlayEl) handlers.close();
@@ -27,13 +27,13 @@ export function initModal(handlers) {
 }
 
 export function open() {
-  overlayEl.classList.add('open');
+  overlayEl.classList.add('modal-overlay--open');
   document.body.style.overflow = 'hidden';
   document.documentElement.style.overflow = 'hidden';
 }
 
 export function close() {
-  overlayEl.classList.remove('open');
+  overlayEl.classList.remove('modal-overlay--open');
   document.body.style.overflow = '';
   document.documentElement.style.overflow = '';
 }
