@@ -76,6 +76,7 @@ export function setupHome(cardClickCallback) {
   const sortIdBtn = document.getElementById("sortId");
   const sortNameBtn = document.getElementById("sortName");
   const typeFilterSelect = document.getElementById("typeFilter");
+  const typeFilterWrap = document.querySelector(".type-filter-wrap");
 
   sortIdBtn.addEventListener("click", () => {
     setSortMode("id");
@@ -92,7 +93,20 @@ export function setupHome(cardClickCallback) {
   });
 
   // Type filter
+  let typeMenuOpen = false;
+  const setTypeMenuOpen = (next) => {
+    typeMenuOpen = next;
+    if (typeFilterWrap) {
+      typeFilterWrap.classList.toggle("open", typeMenuOpen);
+    }
+  };
+
+  typeFilterSelect.addEventListener("click", () => {
+    setTypeMenuOpen(!typeMenuOpen);
+  });
+
   typeFilterSelect.addEventListener("change", () => {
+    setTypeMenuOpen(false);
     setTypeFilter(typeFilterSelect.value);
     if (getTypeFilter()) {
       ensureAllPokemonLoaded().then(async () => {
@@ -104,6 +118,15 @@ export function setupHome(cardClickCallback) {
     }
     renderGrid();
     syncLoadMoreVisibility();
+  });
+
+  typeFilterSelect.addEventListener("blur", () => {
+    setTypeMenuOpen(false);
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!typeFilterWrap || typeFilterWrap.contains(e.target)) return;
+    setTypeMenuOpen(false);
   });
 }
 
