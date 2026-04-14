@@ -66,6 +66,8 @@ function hideDetailImmediate() {
     contentEl.__pokemonNotebookClose = null;
     contentEl.dataset.bookSessionOpen = 'false';
     contentEl.dataset.detailLoading = 'false';
+    contentEl.dataset.detailId = '';
+    contentEl.innerHTML = '';
   }
 }
 

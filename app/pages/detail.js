@@ -29,20 +29,23 @@ export async function fetchDetailState(id) {
 export async function loadDetail(id, contentEl, handlers = {}) {
   const requestId = ++activeDetailRequest;
   const hasNotebook = !!contentEl.querySelector('[data-book-root]');
+  const currentDetailId = Number(contentEl?.dataset?.detailId);
+  const reuseNotebook = hasNotebook && currentDetailId === id;
 
   contentEl.dataset.detailLoading = 'true';
 
-  if (!hasNotebook) {
+  if (!reuseNotebook) {
     contentEl.innerHTML = '<div class="modal-loading"><div class="spinner-lg"></div></div>';
   }
 
   try {
     const detailState = await fetchDetailState(id);
     if (requestId !== activeDetailRequest) return;
-    contentEl.innerHTML = renderPokedex(detailState, { hideUntilReady: !hasNotebook });
+    contentEl.innerHTML = renderPokedex(detailState, { hideUntilReady: !reuseNotebook });
 
     hydratePokedex(contentEl, handlers);
     contentEl.dataset.detailLoading = 'false';
+    contentEl.dataset.detailId = String(id);
 
   } catch (e) {
     if (requestId !== activeDetailRequest) return;

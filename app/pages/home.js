@@ -1,5 +1,10 @@
 // Home page: card grid rendering, search/sort controls, pagination, and load-more logic
-import { cardHTML, injectTypes, showSkeletons, setupImageFallbacks } from "../../components/card.js";
+import {
+  cardHTML,
+  injectTypes,
+  showSkeletons,
+  setupImageFallbacks,
+} from "../../components/card.js";
 import {
   getPokemon,
   fetchTotalCount,
@@ -9,7 +14,6 @@ import cache from "../../lib/services/cache.js";
 import {
   getSearchQuery,
   setSearchQuery,
-  getSortMode,
   setSortMode,
   getTypeFilter,
   setTypeFilter,
@@ -121,7 +125,9 @@ export function setupHome(cardClickCallback) {
   gridEl.addEventListener("click", handleGridClick);
   gridEl.addEventListener("keydown", handleGridKeydown);
   loadMoreBtn.addEventListener("click", loadMore);
-  document.querySelector(".search-input").addEventListener("input", handleSearchInput);
+  document
+    .querySelector(".search-input")
+    .addEventListener("input", handleSearchInput);
   sortIdBtn.addEventListener("click", handleSortByIdClick);
   sortNameBtn.addEventListener("click", handleSortByNameClick);
   typeFilterSelect.addEventListener("click", handleTypeFilterClick);
@@ -209,9 +215,6 @@ function renderGrid() {
         ? `${capitalize(typeFilter)} type`
         : "your filters";
     gridEl.innerHTML = `<div class="empty-state">
-      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
       <p>No Pok\u00e9mon match ${emptyLabel}</p>
     </div>`;
     return;
