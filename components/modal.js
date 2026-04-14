@@ -11,6 +11,11 @@ export function initModal(handlers) {
   };
 
   const handleModalClick = (e) => {
+    const bookCloseBtn = e.target.closest('[data-book-action="close"]');
+    if (bookCloseBtn) {
+      handlers.close();
+      return;
+    }
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
     const action = btn.dataset.action;
